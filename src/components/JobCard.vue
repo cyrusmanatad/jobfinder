@@ -8,6 +8,17 @@ const props = defineProps({
 
 const isModalOpen = ref(false);
 
+const postedAgo = (date) => {
+  const now = new Date();
+  const postedDate = new Date(date);
+  const diffTime = Math.abs(now - postedDate);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'today';
+  if (diffDays === 1) return '1 day ago';
+  return `${diffDays} days ago`;
+};
+
 const openModal = () => {
   isModalOpen.value = true;
 };
@@ -33,9 +44,9 @@ const closeModal = () => {
         >
           <span class="font-medium text-green-600">{{job.salary}}</span>
           <span class="hidden sm:inline">&bull;</span>
-          <span>{{job.department}}</span>
+          <span>{{job.location}}</span>
           <span class="hidden sm:inline">&bull;</span>
-          <span>{{job.postedAgo}}</span>
+          <span>{{ postedAgo(job.created_at) }}</span>
         </div>
       </div>
       <div class="mt-4 sm:mt-0 flex items-start space-x-2 shrink-0">

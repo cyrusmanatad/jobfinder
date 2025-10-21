@@ -17,7 +17,7 @@ const closeModal = () => {
 
 <template>
   <div
-    class="fixed inset-0 bg-black/50 z-50 flex justify-center items-center p-4"
+    class="fixed inset-0 h-full bg-black/50 z-50 flex justify-center items-center p-4"
   >
     <div
       class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col"
