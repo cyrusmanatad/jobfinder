@@ -1,13 +1,14 @@
 <script setup>
-import Hero from "../components/Hero.vue";
-import JobListings from "../components/JobListings.vue";
-import HomeCards from "../components/HomeCards.vue";
+import FeaturedJobs from '../components/FeaturedJobs.vue';
+import Hero from '../components/Hero.vue';
+import HomeCards from '../components/HomeCards.vue';
+
 </script>
 
 <template>
-  <Hero title="Find Your Dream Job!" />
+  <Hero />
   <HomeCards />
-  <JobListings :limit="3" :show-button="true" />
+  <FeaturedJobs />
 </template>
 
 <style scoped></style>
