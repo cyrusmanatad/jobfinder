@@ -63,7 +63,7 @@ const closeModal = () => {
           </div>
         </div>
 
-        <div class="prose max-w-none text-gray-600">
+        <div class="prose max-w-none text-sm text-gray-600">
           <h3 class="text-lg font-semibold text-gray-800 mb-2">
             Job Description
           </h3>
