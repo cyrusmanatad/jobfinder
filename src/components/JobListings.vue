@@ -1,11 +1,11 @@
 <script setup>
-import { onMounted, reactive, watch } from "vue";
+import { onMounted, reactive, watch, computed } from "vue";
 import SkeletonLoader from "./SkeletonLoader.vue";
 import JobCard from "./JobCard.vue";
 import axios from "axios";
 
 defineProps({
-  limit: Number,
+  limit: Number, // optional prop, not required after pagination
   showButton: {
     type: Boolean,
     default: false,
@@ -21,24 +21,69 @@ const state = reactive({
   jobs: [],
   search: "",
   isLoading: true,
+  currentPage: 1,
+  lastPage: 1,
+  perPage: 5,
+  from: 0,
+  to: 0,
+  total: 0,
+  links: [],
 });
 
+// Pagination logic
+const paginatedJobs = computed(() => {
+  const start = (state.currentPage - 1) * state.itemsPerPage;
+  const end = start + state.itemsPerPage;
+  return state.jobs.slice(start, end);
+});
+
+function goToPage(page) {
+  if (page >= 1 && page <= state.total) {
+    state.currentPage = page;
+  }
+}
+
+async function updateJobs(data) {
+  state.jobs = data.data;
+  state.initJobs = data.data;
+  state.currentPage = data.current_page || 1;
+  state.lastPage = data.last_page || 1;
+  state.perPage = data.per_page || 1;
+  state.from = data.from || 0;
+  state.to = data.to || 0;
+  state.total = data.total || 0;
+  state.links = data.links || [];
+}
+
+// Watch search and reset to page 1
 watch(
   () => state.search,
   (newSearch) => {
-    // Implement search filtering logic here if needed
+    state.currentPage = 1;
     state.jobs = state.initJobs.filter((job) =>
-      job.title.toLowerCase().includes(newSearch.toLowerCase())
+      job.title.toLowerCase().includes(newSearch.toLowerCase()),
     );
-  }
+  },
+);
+
+watch(
+  () => state.currentPage,
+  async (newPage) => {
+    state.isLoading = true;
+    const response = await axios.get("api/job-listings?page=" + newPage);
+    const data = await response.data;
+    await updateJobs(data);
+    state.isLoading = false;
+  },
 );
 
 onMounted(async () => {
   try {
     const response = await axios.get("api/job-listings");
-    state.jobs = await response.data;
-    state.initJobs = state.jobs;
+    const data = await response.data;
+    await updateJobs(data);
   } catch (error) {
+    console.error("Failed to fetch jobs", error);
   } finally {
     state.isLoading = false;
   }
@@ -107,6 +152,48 @@ onMounted(async () => {
         :key="job.id"
         :job="job"
       />
+
+      <!-- Pagination Controls -->
+      <div v-if="state.total > 1" class="mt-6 flex justify-center space-x-2">
+        <button
+          @click="goToPage(1)"
+          :disabled="state.currentPage === 1"
+          :class="[
+            state.currentPage === 1 ? 'text-gray-500' : 'cursor-pointer bg-white',
+            'rounded border border-gray-200 px-2 py-1 text-sm',
+          ]"
+        >
+          &lsaquo; First
+        </button>
+
+        <button
+          v-for="(link, index) in state.links"
+          :key="link.page"
+          @click="goToPage(link.page)"
+          
+          :class="[
+            index === 0 && state.currentPage === 1 ? 'text-gray-500' : 'cursor-pointer hover:bg-blue-500 hover:text-white',
+            'rounded border border-gray-200 px-2 py-1 text-sm',
+            link.page === state.currentPage
+              ? 'bg-blue-500 text-white'
+              : 'bg-white text-gray-700',
+          ]"
+          v-html="link.label"
+        ></button>
+
+        <button
+          @click="goToPage(state.lastPage)"
+          :disabled="state.currentPage === state.lastPage"
+          :class="[
+            state.currentPage === state.lastPage
+              ? 'text-gray-500'
+              : 'cursor-pointer bg-white hover:bg-blue-500 hover:text-white',
+            'rounded border border-gray-200 px-2 py-1 text-sm',
+          ]"
+        >
+          Last &rsaquo;
+        </button>
+      </div>
     </div>
   </div>
 </template>
