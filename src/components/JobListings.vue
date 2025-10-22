@@ -161,13 +161,7 @@ onMounted(() => {
       <div v-if="state.total > 1" class="mt-6 flex justify-center space-x-2">
         <button
           @click="goToPage(1)"
-          :disabled="state.currentPage === 1"
-          :class="[
-            'rounded border border-gray-200 px-2 py-1 text-sm',
-            state.currentPage === 1
-              ? 'text-gray-500'
-              : 'cursor-pointer bg-white',
-          ]"
+          class="cursor-pointer rounded border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
         >
           &lsaquo; First
         </button>
@@ -177,23 +171,15 @@ onMounted(() => {
           :key="link.page"
           @click="goToPage(link.page)"
           v-html="link.label"
-          :class="[
-            'rounded border border-gray-200 px-2 py-1 text-sm',
-            link.page === state.currentPage
-              ? 'bg-blue-500 text-white'
-              : 'bg-white text-gray-700 hover:bg-blue-500 hover:text-white',
-          ]"
+          class="cursor-pointer rounded border border-gray-200 bg-blue-500 px-2 py-1 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
+          :class="
+            link.active ? 'bg-blue-500 bg-blue-600 text-white' : 'bg-white'
+          "
         ></button>
 
         <button
           @click="goToPage(state.lastPage)"
-          :disabled="state.currentPage === state.lastPage"
-          :class="[
-            'rounded border border-gray-200 px-2 py-1 text-sm',
-            state.currentPage === state.lastPage
-              ? 'text-gray-500'
-              : 'cursor-pointer bg-white hover:bg-blue-500 hover:text-white',
-          ]"
+          class="cursor-pointer rounded border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
         >
           Last &rsaquo;
         </button>
