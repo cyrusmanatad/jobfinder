@@ -4,8 +4,9 @@ import SkeletonLoader from "./SkeletonLoader.vue";
 import JobCard from "./JobCard.vue";
 import axios from "axios";
 
-defineProps({
-  limit: Number, // optional prop, not required after pagination
+// Props
+const props = defineProps({
+  limit: Number,
   showButton: {
     type: Boolean,
     default: false,
@@ -16,6 +17,7 @@ defineProps({
   },
 });
 
+// State
 const state = reactive({
   initJobs: [],
   jobs: [],
@@ -30,68 +32,70 @@ const state = reactive({
   links: [],
 });
 
-// Pagination logic
-const paginatedJobs = computed(() => {
-  const start = (state.currentPage - 1) * state.itemsPerPage;
-  const end = start + state.itemsPerPage;
-  return state.jobs.slice(start, end);
-});
+// Computed
+const displayedJobs = computed(() =>
+  props.limit ? state.jobs.slice(0, props.limit) : state.jobs,
+);
 
+// Methods
 function goToPage(page) {
-  if (page >= 1 && page <= state.total) {
+  if (page >= 1 && page <= state.lastPage) {
     state.currentPage = page;
   }
 }
 
-async function updateJobs(data) {
-  state.jobs = data.data;
-  state.initJobs = data.data;
+async function fetchJobs(page = 1) {
+  try {
+    state.isLoading = true;
+    const { data } = await axios.get(`/api/job-listings?page=${page}`);
+    updateJobs(data);
+  } catch (error) {
+    console.error("Failed to fetch jobs", error);
+  } finally {
+    state.isLoading = false;
+  }
+}
+
+function updateJobs(data) {
+  state.initJobs = data.data || [];
+  state.jobs = [...state.initJobs];
   state.currentPage = data.current_page || 1;
   state.lastPage = data.last_page || 1;
-  state.perPage = data.per_page || 1;
+  state.perPage = data.per_page || 5;
   state.from = data.from || 0;
   state.to = data.to || 0;
   state.total = data.total || 0;
   state.links = data.links || [];
 }
 
-// Watch search and reset to page 1
+// Watchers
 watch(
   () => state.search,
   (newSearch) => {
     state.currentPage = 1;
+    const searchTerm = newSearch.toLowerCase();
     state.jobs = state.initJobs.filter((job) =>
-      job.title.toLowerCase().includes(newSearch.toLowerCase()),
+      job.title.toLowerCase().includes(searchTerm),
     );
   },
 );
 
 watch(
   () => state.currentPage,
-  async (newPage) => {
-    state.isLoading = true;
-    const response = await axios.get("api/job-listings?page=" + newPage);
-    const data = await response.data;
-    await updateJobs(data);
-    state.isLoading = false;
+  (newPage) => {
+    fetchJobs(newPage);
   },
 );
 
-onMounted(async () => {
-  try {
-    const response = await axios.get("api/job-listings");
-    const data = await response.data;
-    await updateJobs(data);
-  } catch (error) {
-    console.error("Failed to fetch jobs", error);
-  } finally {
-    state.isLoading = false;
-  }
+// Lifecycle
+onMounted(() => {
+  fetchJobs();
 });
 </script>
 
 <template>
   <div class="space-y-6">
+    <!-- Filter Section -->
     <div
       v-if="showFilter"
       class="flex flex-col md:flex-row md:items-center md:justify-between"
@@ -100,41 +104,45 @@ onMounted(async () => {
         Job Listings
       </h2>
 
-      <div className="flex items-center space-x-4">
-        <div className="relative">
+      <div class="flex items-center space-x-4">
+        <!-- Search Box -->
+        <div class="relative">
           <div
-            className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
           >
-            <i className="pi pi-search text-gray-400"></i>
+            <i class="pi pi-search text-gray-400"></i>
           </div>
           <input
-            id="search"
-            name="search"
             v-model="state.search"
-            className="block w-100 border bg-white border-gray-300 rounded-md shadow-sm py-2 px-7 text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            class="block w-100 rounded-md border border-gray-300 bg-white px-7 py-2 text-sm placeholder-gray-500 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
             placeholder="Type a job title or role"
             type="search"
           />
         </div>
+
+        <!-- Sort Options -->
         <select
           id="sortOptions"
-          className="border bg-white border-gray-300 rounded-md shadow-sm pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          class="rounded-md border border-gray-300 bg-white py-2 pr-8 pl-3 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
         >
           <option>Date Posted</option>
           <option>Salary</option>
           <option>Relevance</option>
         </select>
+
+        <!-- Sort Buttons -->
         <div
           class="flex items-center justify-center rounded-md text-base shadow-sm"
         >
           <button
+            type="button"
             class="cursor-pointer rounded-l border-t border-b border-l border-gray-200 bg-white py-2 pr-3 pl-4 text-sm font-bold text-gray-500 uppercase transition-all duration-150 ease-linear"
-            type="button"
           >
-            <i class="pi pi-sort-alpha-down text-blue-500"></i></button
-          ><button
-            class="cursor-pointer rounded-r border-t border-r border-b border-solid border-gray-200 bg-white py-2 pr-4 pl-3 text-sm font-bold text-gray-500 uppercase transition-all duration-150 ease-linear"
+            <i class="pi pi-sort-alpha-down text-blue-500"></i>
+          </button>
+          <button
             type="button"
+            class="cursor-pointer rounded-r border-t border-r border-b border-solid border-gray-200 bg-white py-2 pr-4 pl-3 text-sm font-bold text-gray-500 uppercase transition-all duration-150 ease-linear"
           >
             <i class="pi pi-sort-alpha-up-alt"></i>
           </button>
@@ -142,25 +150,23 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- <Modal/> -->
-
+    <!-- Loading Skeleton -->
     <SkeletonLoader v-if="state.isLoading" v-for="n in limit || 5" :key="n" />
 
+    <!-- Job Cards -->
     <div v-else class="space-y-4">
-      <JobCard
-        v-for="job in state.jobs.slice(0, limit || state.jobs.length)"
-        :key="job.id"
-        :job="job"
-      />
+      <JobCard v-for="job in displayedJobs" :key="job.id" :job="job" />
 
-      <!-- Pagination Controls -->
+      <!-- Pagination -->
       <div v-if="state.total > 1" class="mt-6 flex justify-center space-x-2">
         <button
           @click="goToPage(1)"
           :disabled="state.currentPage === 1"
           :class="[
-            state.currentPage === 1 ? 'text-gray-500' : 'cursor-pointer bg-white',
             'rounded border border-gray-200 px-2 py-1 text-sm',
+            state.currentPage === 1
+              ? 'text-gray-500'
+              : 'cursor-pointer bg-white',
           ]"
         >
           &lsaquo; First
@@ -170,25 +176,23 @@ onMounted(async () => {
           v-for="(link, index) in state.links"
           :key="link.page"
           @click="goToPage(link.page)"
-          
+          v-html="link.label"
           :class="[
-            index === 0 && state.currentPage === 1 ? 'text-gray-500' : 'cursor-pointer hover:bg-blue-500 hover:text-white',
             'rounded border border-gray-200 px-2 py-1 text-sm',
             link.page === state.currentPage
               ? 'bg-blue-500 text-white'
-              : 'bg-white text-gray-700',
+              : 'bg-white text-gray-700 hover:bg-blue-500 hover:text-white',
           ]"
-          v-html="link.label"
         ></button>
 
         <button
           @click="goToPage(state.lastPage)"
           :disabled="state.currentPage === state.lastPage"
           :class="[
+            'rounded border border-gray-200 px-2 py-1 text-sm',
             state.currentPage === state.lastPage
               ? 'text-gray-500'
               : 'cursor-pointer bg-white hover:bg-blue-500 hover:text-white',
-            'rounded border border-gray-200 px-2 py-1 text-sm',
           ]"
         >
           Last &rsaquo;
