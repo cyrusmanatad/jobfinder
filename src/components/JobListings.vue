@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, watch, computed } from "vue";
+import { onMounted, reactive, watch, computed, onWatcherCleanup } from "vue";
 import SkeletonLoader from "./SkeletonLoader.vue";
 import JobCard from "./JobCard.vue";
 import axios from "axios";
@@ -19,7 +19,6 @@ const props = defineProps({
 
 // State
 const state = reactive({
-  initJobs: [],
   jobs: [],
   search: "",
   isLoading: true,
@@ -41,13 +40,16 @@ const displayedJobs = computed(() =>
 function goToPage(page) {
   if (page >= 1 && page <= state.lastPage) {
     state.currentPage = page;
+    fetchJobs(page, state.search);
   }
 }
 
-async function fetchJobs(page = 1) {
+async function fetchJobs(page = 1, search = "") {
   try {
     state.isLoading = true;
-    const { data } = await axios.get(`/api/job-listings?page=${page}`);
+    let query = search ? `&search=${search}` : "";
+    const { data } = await axios.get(`/api/job-listings?page=${page}${query}`);
+
     updateJobs(data);
   } catch (error) {
     console.error("Failed to fetch jobs", error);
@@ -57,8 +59,7 @@ async function fetchJobs(page = 1) {
 }
 
 function updateJobs(data) {
-  state.initJobs = data.data || [];
-  state.jobs = [...state.initJobs];
+  state.jobs = data.data || [];
   state.currentPage = data.current_page || 1;
   state.lastPage = data.last_page || 1;
   state.perPage = data.per_page || 5;
@@ -72,11 +73,14 @@ function updateJobs(data) {
 watch(
   () => state.search,
   (newSearch) => {
+    const controller = new AbortController();
     state.currentPage = 1;
-    const searchTerm = newSearch.toLowerCase();
-    state.jobs = state.initJobs.filter((job) =>
-      job.title.toLowerCase().includes(searchTerm),
-    );
+
+    fetchJobs(1, newSearch.toLowerCase());
+
+    onWatcherCleanup(() => {
+      controller.abort();
+    });
   },
 );
 
@@ -127,7 +131,6 @@ onMounted(() => {
         >
           <option>Date Posted</option>
           <option>Salary</option>
-          <option>Relevance</option>
         </select>
 
         <!-- Sort Buttons -->
@@ -158,7 +161,7 @@ onMounted(() => {
       <JobCard v-for="job in displayedJobs" :key="job.id" :job="job" />
 
       <!-- Pagination -->
-      <div v-if="state.total > 1" class="mt-6 flex justify-center space-x-2">
+      <div v-if="state.total > 0 && state.jobs.length > 0" class="mt-6 flex justify-center space-x-2">
         <button
           @click="goToPage(1)"
           class="cursor-pointer rounded border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
@@ -167,13 +170,13 @@ onMounted(() => {
         </button>
 
         <button
-          v-for="(link, index) in state.links"
+          v-for="link in state.links"
           :key="link.page"
           @click="goToPage(link.page)"
           v-html="link.label"
           class="cursor-pointer rounded border border-gray-200 bg-blue-500 px-2 py-1 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
           :class="
-            link.active ? 'bg-blue-500 bg-blue-600 text-white' : 'bg-white'
+            link.active ? 'bg-blue-50 text-white' : 'bg-white'
           "
         ></button>
 

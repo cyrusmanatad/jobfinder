@@ -36,7 +36,7 @@ const dateFilters = ['All Time', 'Today', 'This Week', 'This Month'];
       >
         <h3 className="text-lg font-semibold text-gray-900">Job Filters</h3>
         <button
-          className="text-sm font-medium text-blue-600 hover:text-blue-800"
+          className="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800"
         >
           Reset Filters
         </button>
@@ -62,16 +62,16 @@ const dateFilters = ['All Time', 'Today', 'This Week', 'This Month'];
             <input
               type="number"
               placeholder="10000"
-              className="w-full bg-white border-gray-200 rounded-md shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500 py-2.5 px-3"
+              className="w-full bg-white border border-gray-200 rounded-md shadow-sm text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none py-2 px-3"
             />
             <span className="text-gray-500">&rarr;</span>
             <input
               type="number"
               placeholder="50000"
-              className="w-full bg-white border-gray-200 rounded-md shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500 py-2.5 px-3"
+              className="w-full bg-white border border-gray-200 rounded-md shadow-sm text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none py-2 px-3"
             />
           </div>
-          <div className="mt-4">
+          <!-- <div className="mt-4">
             <input
               type="range"
               min="10000"
@@ -79,7 +79,7 @@ const dateFilters = ['All Time', 'Today', 'This Week', 'This Month'];
               defaultValue="50000"
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
-          </div>
+          </div> -->
         </div>
 
         <!-- {/* Recruitment Type Filter */} -->
