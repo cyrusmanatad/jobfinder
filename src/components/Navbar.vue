@@ -13,17 +13,17 @@
         <nav class="hidden md:flex md:space-x-8">
           <a
             href="/"
-            class="text-gray-500 hover:text-gray-700 font-medium px-3 py-2 rounded-md text-sm"
+            class="text-gray-500 hover:text-gray-700 font-medium px-3 py-2 text-sm"
           >
             Home
           </a>
           <a
             href="/careers"
-            class="text-gray-500 hover:text-gray-700 font-medium px-3 py-2 rounded-md text-sm"
+            class="text-gray-500 hover:text-gray-700 font-medium px-3 py-2 text-sm"
           >
             Careers
           </a>
-          <a
+          <!-- <a
             href="#"
             class="text-gray-500 hover:text-gray-700 font-medium px-3 py-2 rounded-md text-sm"
           >
@@ -34,7 +34,7 @@
             class="text-gray-500 hover:text-gray-700 font-medium px-3 py-2 rounded-md text-sm"
           >
             Contact
-          </a>
+          </a> -->
         </nav>
         <div class="flex items-center">
           <a
