@@ -1,4 +1,7 @@
 <script setup>
+import { useAuthStore } from '@/stores/auth';
+
+const auth =  useAuthStore();
 </script>
 
 <template>
@@ -39,9 +42,18 @@
         <div class="flex items-center">
           <a
             href="#"
+            v-if="auth.user === null"
             class="ml-8 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
           >
             Sign In
+          </a>
+          <a
+            href="#"
+            v-else
+            @click="auth.logout()"
+            class="ml-8 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+          >
+            Logout
           </a>
         </div>
       </div>
