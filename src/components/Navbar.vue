@@ -10,13 +10,19 @@ const onlogout = ref(false);
 const router = useRouter();
 
 const logout = async () => {
-  onlogout.value = !onlogout.value;
-  const success = await auth.logout();
+  onlogout.value = true;
+  try {
+    const success = await auth.logout();
 
-  if(success) {
-    router.push({ name: 'login'})
+    if (success) {
+      router.push({ name: 'login' });
+    }
+  } catch (error) {
+    console.error('Logout failed:', error);
+  } finally {
+    onlogout.value = false;
   }
-}
+};
 </script>
 
 <template>
