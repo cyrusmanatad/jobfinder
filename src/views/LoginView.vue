@@ -1,30 +1,52 @@
 <script setup>
 import axios from "@/axios"; // axios.js file
 import { useAuthStore } from "@/stores/auth";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+
 
 const credentials = reactive({
-  email: "",
-  password: "",
+  authMessage: "",
+  email: {
+    value: "",
+    valid: true,
+  },
+  password: {
+    value: "",
+    valid: true,
+  },
 });
 
 const router = useRouter();
 
+const authenticating = ref(false);
+
 const handleLogin = async () => {
   const auth = useAuthStore();
 
-  await axios.get("/sanctum/csrf-cookie");
+  authenticating.value = !authenticating.value;
 
-  await axios.post("/api/login", {
-    email: credentials.email,
-    password: credentials.password,
-  });
+  try {
+    await axios.get("/sanctum/csrf-cookie");
 
-  const { data: user } = await axios.get("/api/user");
-  auth.user = user;
+    await axios.post("/api/login", {
+      email: credentials.email.value,
+      password: credentials.password.value,
+    });
 
-  router.push({ name: "home" });
+    const { data: user } = await axios.get("/api/user");
+    auth.user = user;
+
+    router.push({ name: "home" });
+  } catch (error) {
+    credentials.authMessage = error.response.data.message;
+
+    credentials.email.valid = false;
+    credentials.password.valid = false;
+  } finally {
+    authenticating.value = !authenticating.value;
+  }
 };
 </script>
 
@@ -63,9 +85,14 @@ const handleLogin = async () => {
                 name="email"
                 type="email"
                 autoComplete="email"
-                v-model="credentials.email"
+                v-model="credentials.email.value"
                 required
-                class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
+                class="block w-full appearance-none rounded-md border px-3 py-2 placeholder-gray-400 shadow-sm focus:outline-none sm:text-sm"
+                :class="[
+                  credentials.email.valid
+                    ? 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                    : 'border-2 border-red-400',
+                ]"
               />
             </div>
           </div>
@@ -83,9 +110,14 @@ const handleLogin = async () => {
                 name="password"
                 type="password"
                 autoComplete="current-password"
-                v-model="credentials.password"
+                v-model="credentials.password.value"
                 required
-                class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
+                class="block w-full appearance-none rounded-md border px-3 py-2 placeholder-gray-400 shadow-sm focus:outline-none sm:text-sm"
+                :class="[
+                  credentials.email.valid
+                    ? 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+                    : 'border-2 border-red-400',
+                ]"
               />
             </div>
           </div>
@@ -113,12 +145,29 @@ const handleLogin = async () => {
             </div>
           </div>
 
+          <label
+            htmlFor="email"
+            v-show="
+              credentials.email.valid === false ||
+              credentials.password.valid === false
+            "
+            class="block text-sm font-medium text-red-700"
+          >
+            {{ credentials.authMessage }}
+          </label>
+
           <div>
             <button
               type="submit"
-              class="flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+              :disabled="authenticating"
+              class="flex w-full cursor-pointer justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-default disabled:bg-gray-400"
             >
-              Sign in
+              {{authenticating ? "Please wait" : "Sign In"}}
+              <PulseLoader v-show="authenticating" class="ml-2" size="8px" color="white" />
+              <!-- <i
+                v-show="authenticating"
+                class="pi pi-spinner animate-spin"
+              ></i> -->
             </button>
           </div>
         </form>

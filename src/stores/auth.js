@@ -21,7 +21,7 @@ export const useAuthStore = defineStore("auth", {
     async logout() {
       await axios.post("/api/logout");
       this.user = null;
-      router.push({ name: 'login' });
+      return true;
     },
   },
 });
