@@ -34,9 +34,7 @@
       </div>
     </div>
     <div class="mt-4 border-t border-gray-200 pt-4">
-      <p class="text-sm text-gray-600">
-        <div class="h-4 bg-gray-300 my-2 rounded w-5/6"></div>
-      </p>
+      <div class="h-4 bg-gray-300 my-2 rounded w-5/6"></div>
     </div>
   </div>
 </template>

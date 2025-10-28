@@ -1,6 +1,8 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth';
 
+import { RouterLink } from 'vue-router';
+
 const auth =  useAuthStore();
 </script>
 
@@ -14,18 +16,18 @@ const auth =  useAuthStore();
           </a>
         </div>
         <nav class="hidden md:flex md:space-x-8">
-          <a
-            href="/"
+          <RouterLink
+            to="/"
             class="text-gray-500 hover:text-gray-700 font-medium px-3 py-2 text-sm"
           >
             Home
-          </a>
-          <a
-            href="/careers"
+          </RouterLink>
+          <RouterLink
+            to="/careers"
             class="text-gray-500 hover:text-gray-700 font-medium px-3 py-2 text-sm"
           >
             Careers
-          </a>
+          </RouterLink>
           <!-- <a
             href="#"
             class="text-gray-500 hover:text-gray-700 font-medium px-3 py-2 rounded-md text-sm"
