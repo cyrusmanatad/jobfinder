@@ -1,20 +1,21 @@
 // src/stores/auth.js
 import { defineStore } from "pinia";
 import axios from "@/axios"; // axios.js file
-import { useRouter } from "vue-router";
-const router = useRouter();
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: null,
     loading: false,
+    status: null,
   }),
   actions: {
     async fetchUser() {
       try {
-        const { data } = await axios.get("/api/user");
+        const { data, status } = await axios.get("/api/user");
         this.user = data;
-      } catch {
+        this.status = status
+      } catch(error) {
+        this.status = error.response.status
         this.user = null;
       }
     },
