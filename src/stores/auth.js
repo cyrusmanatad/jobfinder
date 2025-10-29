@@ -10,6 +10,7 @@ export const useAuthStore = defineStore("auth", {
   }),
   actions: {
     async fetchUser() {
+      this.loading = true;
       try {
         const { data, status } = await axios.get("/api/user");
         this.user = data;
@@ -17,6 +18,8 @@ export const useAuthStore = defineStore("auth", {
       } catch(error) {
         this.status = error.response.status
         this.user = null;
+      } finally {
+        this.loading = false;
       }
     },
     async logout() {

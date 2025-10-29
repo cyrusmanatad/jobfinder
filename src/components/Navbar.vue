@@ -1,6 +1,6 @@
 <script setup>
 import { useAuthStore } from "@/stores/auth";
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import PulseLoader from "vue-spinner/src/PulseLoader.vue";
 
@@ -12,26 +12,22 @@ const onlogout = ref(false);
 onMounted(() => {
   auth.loading = true;
 
-  const userStatus = computed(() => [auth.user, auth.status])
-
   watch(
-    () => userStatus,
-    (data) => {
-      const [user, status] = data.value
-      
+    [() => auth.user, () => auth.status],
+    ([user, status]) => {
       if (user !== undefined || status !== null) {
-        auth.loading = false;
+        auth.loading = false
       }
     },
     { immediate: true }
-  );
+  )
 });
 
 
 const logout = async () => {
-  onlogout.value = !onlogout.value;
+  onlogout.value = true;
   const success = await auth.logout();
-  onlogout.value = !onlogout.value;
+  onlogout.value = false;
 
   if (success) {
     router.push({ name: "login" });
@@ -63,7 +59,7 @@ const logout = async () => {
         <div class="flex items-center">
           <div
             v-if="auth.loading"
-            class="ml-8 h-9 w-20 animate-pulse rounded-md bg-gray-200"
+            class="ml-8 inline-flex h-9 w-20 items-center justify-center rounded-md bg-gray-200 shadow-sm animate-pulse"
           ></div>
           <RouterLink
             to="login"
