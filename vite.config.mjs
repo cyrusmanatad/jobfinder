@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
       port: 3001,
       proxy: {
         "/api": {
-          target: "http://ec2-50-17-90-79.compute-1.amazonaws.com", // ✅ Use IPv4 explicitly
+          target: env.VITE_API_URL || "http://localhost:8000", // ✅ Use IPv4 explicitly
           changeOrigin: true,
           // rewrite: (path) => path.replace(/^\/api/, '')
         },
