@@ -1,13 +1,18 @@
-import axios from 'axios';
+import axios from "axios";
 
-// Use environment variable, fallback to localhost for development
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-axios.defaults.withCredentials = true; // required for Sanctum
-axios.defaults.withXSRFToken = true; // required for Sanctum
+// In production: use relative URLs (Netlify proxy handles it)
+// In development: use localhost directly
+const isProduction = import.meta.env.PROD;
 
-// Optional: Log the API URL in development for debugging
+axios.defaults.baseURL = isProduction
+  ? "/api" // Netlify will proxy this to your EC2
+  : "http://localhost:8000";
+
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+
 if (import.meta.env.DEV) {
-  console.log('API Base URL:', axios.defaults.baseURL);
+  console.log("API Base URL:", axios.defaults.baseURL);
 }
 
 export default axios;

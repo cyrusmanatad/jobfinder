@@ -2,7 +2,7 @@
   command = "npm run build"
   publish = "dist"
 
-# Proxy API requests to your Laravel backend
+# Proxy API requests through Netlify (avoids mixed content)
 [[redirects]]
   from = "/api/*"
   to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/api/:splat"
