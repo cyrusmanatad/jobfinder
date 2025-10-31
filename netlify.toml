@@ -2,14 +2,35 @@
   command = "npm run build"
   publish = "dist"
 
-# Proxy API requests through Netlify (avoids mixed content)
+# Proxy /sanctum/csrf-cookie
+[[redirects]]
+  from = "/sanctum/*"
+  to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/sanctum/:splat"
+  status = 200
+  force = true
+
+# Proxy /login
+[[redirects]]
+  from = "/login"
+  to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/login"
+  status = 200
+  force = true
+
+# Proxy /logout
+[[redirects]]
+  from = "/logout"
+  to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/logout"
+  status = 200
+  force = true
+
+# Proxy API routes
 [[redirects]]
   from = "/api/*"
   to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/api/:splat"
   status = 200
   force = true
 
-# SPA fallback for Vue Router
+# SPA fallback (must be last)
 [[redirects]]
   from = "/*"
   to = "/index.html"
