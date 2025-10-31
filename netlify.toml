@@ -2,6 +2,15 @@
   command = "npm run build"
   publish = "dist"
 
-# Production environment
-[context.production.environment]
-  VITE_API_URL = "http://ec2-50-17-90-79.compute-1.amazonaws.com"
+# Proxy API requests to your Laravel backend
+[[redirects]]
+  from = "/api/*"
+  to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/api/:splat"
+  status = 200
+  force = true
+
+# SPA fallback for Vue Router
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
