@@ -5,7 +5,7 @@ import axios from "axios";
 const isProduction = import.meta.env.PROD;
 
 axios.defaults.baseURL = isProduction
-  ? "" // Netlify will proxy this to your EC2
+  ? "http://ec2-50-17-90-79.compute-1.amazonaws.com" // Netlify will proxy this to your EC2
   : "http://localhost:8000";
 
 axios.defaults.withCredentials = true;
