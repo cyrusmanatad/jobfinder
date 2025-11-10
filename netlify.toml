@@ -5,28 +5,28 @@
 # Proxy /sanctum/csrf-cookie
 [[redirects]]
   from = "/sanctum/*"
-  to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/sanctum/:splat"
+  to = "https://jobnavigator.duckdns.org/sanctum/:splat"
   status = 200
   force = true
 
 # Proxy /login
 [[redirects]]
   from = "/login"
-  to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/login"
+  to = "https://jobnavigator.duckdns.org/login"
   status = 200
   force = true
 
 # Proxy /logout
 [[redirects]]
   from = "/logout"
-  to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/logout"
+  to = "https://jobnavigator.duckdns.org/logout"
   status = 200
   force = true
 
 # Proxy API routes
 [[redirects]]
   from = "/api/*"
-  to = "http://ec2-50-17-90-79.compute-1.amazonaws.com/api/:splat"
+  to = "https://jobnavigator.duckdns.org/api/:splat"
   status = 200
   force = true
 
